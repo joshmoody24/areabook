@@ -295,6 +295,7 @@ hr{
   padding: 5px;
   transition: .3s;
   position: relative;
+  overflow: hidden;
 }
 
 .person-button:hover{
@@ -440,7 +441,7 @@ ul li{
   padding: 10px;
   z-index: 10;
   position: fixed;
-  top: 33%; 
+  top: 25%; 
   margin: 0 auto;
   width: 300px;
 }
@@ -462,8 +463,11 @@ ul li{
 
 .form-input input{
   flex: 2;
+  border: 1px solid #333;
   height: 100%;
   background-color: white;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .add-event-wrapper{
@@ -475,6 +479,7 @@ ul li{
   background-color: var(--color-primary)!important;
   height: 40px;
   transition: filter .3s;
+  -webkit-appearance: none;
 }
 
 .submit:hover{

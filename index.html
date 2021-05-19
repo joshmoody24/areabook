@@ -77,7 +77,7 @@
 									<label>Event name:</label>
 									<input type="text" v-model="newEventName" name="event-name" id="event-name" required>
 								</div>
-								<div class="form-input">
+								<div class="form-input" @change="pushBackEndTime">
 									<label>Start time:</label>
 									<input type="time" class="input-time" v-model="newEventStartTime" name="event-start-time" id="event-start-time" min="10:00" max="21:00" required>
 								</div>	
@@ -95,7 +95,7 @@
 							</form>
 						</div>
 					</div>
-					<div class="calendar-container">
+					<div class="calendar-container" @click="enableAddMenu">
 						<div class="calendar-main">
 							<div class="calendar-event" v-bind:style="{'background-color':'#bbccff', 'height':60+'px', 'top':0}">
 								<p>Personal Study</p>
@@ -162,8 +162,8 @@
 					<h2 class="center">SYNC</h2>
 					<hr>
 					<br>
-					<p>On the real area book app, you have to sync so your companion can see all the changes you've made. That's not necessary for the purposes of this activity. Instead, use this to upload custom teaching records into the app.</p>
-					<input type="file" id="customDataUpload" @input="uploadData()">
+					<p>On the real area book app, you have to sync so your companion can see all the changes you've made. That's not necessary for the purposes of this activity. Instead, use this to upload custom teaching records into the app.</p><br><p>(Not supported on iOS)</p>
+					<input type="file" id="customDataUpload" @input="uploadData()" accept=".json, .mtc">
 				</div>
 				<div class="app-content teaching-record" :class="{'hidden':tabs[5].active===false}">
 					<p><i class="bi bi-telephone"></i>&nbsp;&nbsp; {{activePerson.phone}}</p><br>

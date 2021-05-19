@@ -6,6 +6,14 @@ for(var i =0; i < buttons.length; i++){
 }
 }
 
+//confirm before allowing user to exit page
+window.addEventListener('beforeunload', function (e) {
+
+	// Cancel the event and show alert that
+	// the unsaved changes would be lost
+	e.preventDefault();
+	e.returnValue = '';
+});
 
 var app = new Vue({
 	el: '#app',
@@ -26,6 +34,7 @@ var app = new Vue({
 		],
 		hours: ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM'],
 		calendarEvents: [],
+		previousStartTime: "10:00",
 		newEventStartTime: "10:00",
 		newEventEndTime: "11:00",
 		newEventName: "",
@@ -94,7 +103,7 @@ var app = new Vue({
 		},
 		async parseJSON (json = null){
 			if(json === null){
-				let response = await fetch("./people.json");
+				let response = await fetch("./people.mtc");
 				this.people = await response.json();
 			}
 			else{
@@ -132,6 +141,7 @@ var app = new Vue({
 			reader.addEventListener('error', function() {
 				alert('Error : Failed to read file');
 			});
+			if(file !== undefined)
 			reader.readAsText(file);
 		},
 		addCalendarEvent(e){
@@ -170,5 +180,15 @@ var app = new Vue({
 		deleteEvent(e){
 			this.calendarEvents = this.calendarEvents.filter(i => i !== e);
 		},
+		pushBackEndTime(){
+			//change the end time by the same amount that the start time got changed
+			var hoursMinutesA = this.previousStartTime.split(":");
+			var hoursMinutesB = this.newEventStartTime.split(":");
+			var deltaHours = parseInt(hoursMinutesB[0]) - parseInt(hoursMinutesA[0]);
+			var deltaMinutes = parseInt(hoursMinutesB[1]) - parseInt(hoursMinutesA[1]);
+			var hoursMinutesC = this.newEventEndTime.split(":");
+			this.newEventEndTime = (parseInt(hoursMinutesC[0]) + deltaHours).toString().padStart(2,"0") + ":" + (parseInt(hoursMinutesC[1]) + deltaMinutes).toString().padStart(2,"0");
+			this.previousStartTime = this.newEventStartTime;
+		},
 	}
-})
+});
