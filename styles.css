@@ -311,6 +311,10 @@ hr{
   user-select: none;
 }
 
+.standard-button:hover{
+  filter:brightness(1.1);
+}
+
 .button{
   user-select: none;
   position: relative;
