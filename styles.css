@@ -496,7 +496,7 @@ ul li{
 
 .fab-container{
   position: fixed;
-  width: calc(min(100%, 670px) - 30px);
+  width: calc(min(100%, 700px) - 30px);
   padding: 8px;
   bottom: 54px;
   height: 104px;
