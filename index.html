@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Area Book Planner</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+	</head>
+	<body onLoad="addRippleEffect()">
+		<div id="app">
+			<div class="app">
+				<div class = "app-header">
+					<div class="status-bar">
+						<div class="status-icons">
+							<p class="time">4:06 PM</p>
+							<div class="status-icons-right">
+								<i class="bi bi-wifi" aria-hidden="true"></i>
+								<i class="bi bi-reception-4" aria-hidden="true"></i>
+								<i class="bi bi-battery-full" aria-hidden="true"></i>
+							</div>
+						</div>
+					</div>
+					<div class="menu">
+						<button class="hamburger-menu button" @click="activateTab('Home')"><i class="bi bi-list" aria-hidden="true"></i></button>
+						<h1>{{currentTab.name}}</h1>
+						<button class="button settings-button"><i class="bi bi-gear" aria-hidden="true"></i></button>
+					</div>
+				</div>
+				<div class="app-content home" v-bind:class="{'hidden':tabs[0].active===false}">
+					<div class="key-indicators">
+						<h2>KEY INDICATORS | WEEKLY</h2>
+						<hr>
+						<div class="ki-grid">
+							<div class="ki-element">
+								<div class="ki-top-row"><div class="ki-bar-bg ki-bc-bg"><div class="ki-bar ki-bc"></div></div><h3>0/1</div>
+								<div class="ki-description">Baptized and Confirmed</div>
+							</div>
+							<div class="ki-element">
+								<div class="ki-top-row"><div class="ki-bar-bg ki-od-bg"><div class="ki-bar ki-od"></div></div><h3>1/2</div>
+								<div class="ki-description">With Baptismal Date</div>
+							</div>
+							<div class="ki-element">
+								<div class="ki-top-row"><div class="ki-bar-bg ki-as-bg"><div class="ki-bar ki-as"></div></div><h3>0/2</div>
+								<div class="ki-description">Sacrament Meeting</div>
+							</div>
+							<div class="ki-element">
+								<div class="ki-top-row"><div class="ki-bar-bg ki-np-bg"><div class="ki-bar ki-np"></div></div><h3>1/3</div>
+								<div class="ki-description">New People</div>
+							</div>
+						</div>
+					</div>
+					<div class="action-items">
+						<h2>ACTION ITEMS</h2>
+						<hr>
+						<div class="action-items-flex">
+							<button class="ki-element standard-button button" @click="activateTab('Area Notes')"><i class="bi bi-journal"></i><div class="ki-description center">Area Notes</div></button>
+							<button class="ki-element standard-button button" @click="activateTab('Help')"><i class="bi bi-question-circle"></i><div class="ki-description center">Help</div></button>
+							<button class="ki-element standard-button button" @click="activateTab('About')"><i class="bi bi-info-circle"></i><div class="ki-description center">About</div></button>
+						</div>
+					</div>
+					<br>
+					<br>
+				</div>
+				<div class="app-content calendar" v-bind:class="{'hidden':tabs[1].active===false}">
+					<h2 class="center">{{currentDay}}</h2><br>
+					<div class="add-event-wrapper hidden" id="add-calendar-event">
+						<div class="add-calendar-event">
+							<form action="" method="get" class="calendar-event-form" @submit.prevent="addCalendarEvent">
+								<div class="form-header">
+									<h2>New Event</h2>
+									<button class="close-button" @click="disableAddMenu" type="button">X</button>
+								</div>
+								<div class="form-input">
+									<label>Event name:</label>
+									<input type="text" v-model="newEventName" name="event-name" id="event-name" required>
+								</div>
+								<div class="form-input">
+									<label>Start time:</label>
+									<input type="time" class="input-time" v-model="newEventStartTime" name="event-start-time" id="event-start-time" min="10:00" max="21:00" required>
+								</div>	
+								<div class="form-input">
+									<label>End time:</label>
+									<input type="time" class="input-time" v-model="newEventEndTime" name="event-end-time" id="event-end-time" min="10:00" max="21:00" required>
+								</div>
+								<div class="form-input">
+									<label for="event-color">Color:</label>
+									<input type="color" value="#ccffcc" v-model="newEventColor" name="event-color" id="event-color">
+								</div>
+								<div class="form-input submit">
+									<input type="submit" class="submit button" value="Add Event">
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="calendar-container">
+						<div class="calendar-main">
+							<div class="calendar-event" v-bind:style="{'background-color':'#bbccff', 'height':60+'px', 'top':0}">
+								<p>Personal Study</p>
+							</div>
+							<div class="calendar-event" v-for="event in calendarEvents" v-bind:style="{'background-color': event.color, 'height':event.duration*60+'px', 'top':event.scaledStartTime*60+'px'}">
+								<p>{{event.name}}</p>
+								<button class="close-button" @click="deleteEvent(event)">X</button>
+							</div>
+						</div>
+						<div class="calendar-sidebar">
+							<div class="calendar-label" v-for="hour in hours">
+								<p>{{hour}}</p>
+							</div>
+						</div>
+						<br><br>
+					</div>
+					<div class="fab-container">
+						<button class="floating-action-button" @click="enableAddMenu">
+							<i class="bi bi-plus"></i>
+						</button>
+					</div>
+				</div>
+				<div class="app-content people" :class="{'hidden':tabs[2].active===false}">
+					<h2>PEOPLE WITH A BAPTISMAL DATE</h2>
+					<hr>
+					<button class="person-button" v-for="person in peopleOnDate" v-bind:key="person.name" @click="loadTeachingRecord(person)">
+						<div :class="getPersonIcon(person)"></div>
+						<p>{{person.name}}</p>
+						<br>
+					</button>
+					<br>
+					<h2>PEOPLE BEING TAUGHT</h2>
+					<hr>
+					<button class="person-button" v-for="person in peopleBeingTaught" v-bind:key="person.name" @click="loadTeachingRecord(person)">
+						<div :class="getPersonIcon(person)"></div>
+						<p>{{person.name}}</p>
+					</button>
+					<br>
+					<h2>PEOPLE PREVIOUSLY TAUGHT</h2>
+					<hr>
+					<button class="person-button" v-for="person in peopleFormerlyTaught" v-bind:key="person.name" @click="loadTeachingRecord(person)">
+						<div :class="getPersonIcon(person)"></div>
+						<p>{{person.name}}</p>
+					</button>
+					<br>
+					<h2>MEMBERS</h2>
+					<hr>
+					<button class="person-button" v-for="person in members" v-bind:key="person.name" @click="loadTeachingRecord(person)">
+						<div :class="getPersonIcon(person)"></div>
+						<p>{{person.name}}</p>
+					</button>
+					<br>
+					<br>
+
+				</div>
+				<div class="app-content map" :class="{'hidden':tabs[3].active===false}">
+					<div>
+						<iframe class="map" frameborder="0" src="https://www.bing.com/maps/embed?h=780&w=680&cp=39.14122287391772~-121.58642385846106&lvl=14&typ=d&sty=r&src=SHELL&FORM=MBEDV8" scrolling="no">
+						</iframe>
+
+					</div>
+				</div>
+				<div class="app-content sync" :class="{'hidden':tabs[4].active===false}">
+					<h2 class="center">SYNC</h2>
+					<hr>
+					<br>
+					<p>On the real area book app, you have to sync so your companion can see all the changes you've made. That's not necessary for the purposes of this activity. Instead, use this to upload custom teaching records into the app.</p>
+					<input type="file" id="customDataUpload" @input="uploadData()">
+				</div>
+				<div class="app-content teaching-record" :class="{'hidden':tabs[5].active===false}">
+					<p><i class="bi bi-telephone"></i>&nbsp;&nbsp; {{activePerson.phone}}</p><br>
+					<hr><br>
+					<p><i class="bi bi-geo-alt"></i>&nbsp;&nbsp; {{activePerson.address}}</p>
+					<br>
+					<hr>
+					<br>
+					<h2>Background Information</h2><br>
+					<p>{{activePerson.description}}</p><br>
+					<h2>Age: {{activePerson.age}}</h2>
+				</div>
+				<div class="app-content area-notes" :class="{'hidden':tabs[6].active===false}">
+					<h1>Welcome to the best area in the mission!!!</h1>
+					<p>Marysville is an awesome city. Here's some things you'll want to be aware of:</p>
+					<p>You have dinner with the Roshon family on {{currentDayNoYear}} at 5pm. They were baptized 2 years ago but went less-active because they got scared about going to the temple. Krystal and Rob are the parents. Alexus is 16 and Gavon is 10. They stopped seeing missionaries for a while now, so we're really stoked that we landed this dinner with them. They used to smoke, but quit. We know Krystal was reading up on some anti so we feel like she could use a refresher on the Restoration. Alexus kinda fell out with a lot of the young women in the ward because of some drama and she doesn't really feel like she belongs anymore.</p>
+					<p>Bishop Bowles is a great bishop! Always looking for ways to help the missionaries. You'll definitely want to work closely with him.</p>
+					<p>The teaching records should tell you everything you need to know about the people we're working with. Most of them are pretty chill so we'd recommend just stopped by or calling them to introduce yourself and teach a lesson.<p>
+					<p>Good luck missionaries!!</p>
+				</div>
+				<div class="app-content help" :class="{'hidden':tabs[7].active===false}">
+					<h2>PRO TIPS AND FAQ</h2>
+					<hr>
+					<br>
+					<p>Your job is to plan your first day in your new area! You'll be planning from 10 AM (right after personal study) to 9 PM (when you have to be back in your apartment). Make sure you have a meaningful activity planned for every hour of the day. Meals can take up to 2 hours combined.</p>
+					<ul>
+						<li>Plan with the people in mind. What are their needs? What will you teach them?</li>
+						<li>No need to go too in-depth on lesson plans. A main topic and one or more invitations is sufficient</li>
+						<li>Plan the most important things first. Here are your priorities (see PMG 151):
+							<ol>
+								<li>People on date for baptism</li>
+								<li>Other people being taught</li>
+								<li>Work with members to find new people to teach</li>
+								<li>Find people through your own efforts</li>
+							</ol>
+						<li>Assume there are no covid restrictions</li>
+						<li>Don't forget to have companionship study</li>
+					</ul>
+					<br><br>
+				</div>
+				<div class="app-content about" :class="{'hidden':tabs[8].active===false}">
+					<h2>ABOUT</h2>
+					<hr>
+					<p>This is an unofficial imitiation of Area Book version 3.0, an planning tool used by missionaries from The Church of Jesus Christ of Latter-day Saints.</p>
+					<br>
+					<h2>CREDITS</h2>
+					<hr>
+					<ul>
+						<li>Original app design: The Church (?)</li>
+						<li>Fake version created by Josh Moody</li>
+						<li>Teaching records were copied from a document titled "New Area Notes" linked from the "Innovative Teaching Ideas" document found on the MTC teacher website, with some modifications.</li> 
+					</ul>
+				</div>
+				<div class="app-bg"></div>
+				<div class="footer">
+					<button class="button ripple" @click="activateTab('Home')" :class="{'selected':tabs[0].active}"><i class="bi bi-house" aria-hidden="true"></i>Home</button>
+					<button class="button ripple" @click="activateTab('Calendar')" :class="{'selected':tabs[1].active}"><i class="bi bi-calendar-event" aria-hidden="true"></i>Calendar</button>
+					<button class="button ripple" @click="activateTab('People')" :class="{'selected':tabs[2].active || tabs[5].active}"><i class="bi bi-person" aria-hidden="true"></i>People</button>
+					<button class="button ripple" @click="activateTab('Map')" :class="{'selected':tabs[3].active}"><i class="bi bi-geo-alt" aria-hidden="true"></i>Map</button>
+					<button class="button ripple" @click="activateTab('Sync')" :class="{'selected':tabs[4].active}"><i class="bi bi-arrow-repeat" aria-hidden="true"></i>Sync</button>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+		<script src="/scripts.js"></script>
+	</body>
+</html>
